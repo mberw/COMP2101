@@ -1,58 +1,37 @@
-#!/bin/bash
-#Lab 1 Challenge Script
+#! /bin/bash
+#Lab2 Challenge Script
 #Mark Berwick Student ID: 020004248
 
-#echo with no arguements to add a blank line for readability
-echo
+
+#Gathering the hostname and the removing eveything after the . to create a simple hostname and then putting
+#that into a variable named domain
+domain=$(hostname -A | cut -d "." -f1)
+
+#Gathering the full hostname and putting it into a variable named FullDomain
+FullDomain=$(hostname -A)
+
+#Gathering the IP address that my computer uses to connect to the internet and putting it into
+#a variable named ip
+ip=$(hostname -I)
+
+#Gathering the main file system that my Linux is  using, searching for the word sda3 and then gathering 
+#the words from the 4th column and then storing that in a variable named file
+file=$(df -h | grep -w sda3 | awk '{print $4}' )
+
+#Using cat to look at what is in /etc/os-release for info on the OS on my system
+#then looking for the word pretty (incase sensitive) and then gathering the data from the 
+#second column and then finally putting that in a variable named os
+os=$(cat /etc/os-release | grep -i pretty | awk -F'"' '{print $2}')
 
 
+#Template using cat where only variables are called to fill in the data parts of the output
+cat << EOF
+Report for $domain
+=================
+FQDN: $FullDomain
+Operating System name and version: $os
+IP Address: $ip 
+Root Filesystem Free Space: $file 
+=================
 
-#Gathering and displaying the hostname
-echo "Hostname:     "$HOSTNAME
-
-#echo with no arguements to add a blank line for readability
-echo
-
-
-#Gathering and displaying the system DNS domain name 
-echo -n "Domain Name:       " 
-	hostname -A 
-
-#echo with no arguements to add a blank line for readability
-echo
-
-
-#cat to display the contents of os-release, grep to find the line
-#we're looking for, awk to use a delimiter and separate what we need which
-#is then printed
-echo -n "Operating System and version:       "
-	cat /etc/os-release | grep -i pretty | awk -F'"' '{print $2}'
-
-
-#echo with no arguements to add a blank line for readability
-echo
-
-
-#Gather and display the primary ip address
-echo -n "IP Addresses:       "
-	hostname -I
-
-
-#Gather and display the IPv6 address and we separate just the ip from the
-#rest of the line using grep to find the word inet6 and then awk with
-#a space delimiter to find the ip in the line and then print it
-echo -n "IPv6 Address:       "
-	/sbin/ip -6 addr show dev enp0s3 | grep -w inet6 | awk -F' ' '{print $2}'
-
-
-#echo with no arguements to add a blank line for readability
-echo
-
-#Gathering the header line and the main filesystem where Ubuntu is stored
-#and running
-echo "Root File System Status:"
-df -h | grep -w Filesystem
-df -h | grep -w sda3
-
-#echo with no arguements to add a blank line for readability
-echo
+EOF
